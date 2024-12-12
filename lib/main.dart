@@ -1,125 +1,409 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (context) => MyAppState(),
+      child: MaterialApp(
+        title: 'AI PersonalTrainer',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+        ),
+        home: MyHomePage(),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
+class WorkoutRequest {
+  List<String> days;
+  List<String> goals;
+  List<String> modalities;
+  String duration;
+
+  WorkoutRequest(this.days, this.goals, this.modalities, this.duration);
+
+  Map toJson() => {
+        'days': days,
+        'modalities': modalities,
+        'goals': goals,
+        'duration': duration
+      };
+}
+
+class WorkoutDay {
+  String name;
+  String description;
+  String reps;
+
+  WorkoutDay(this.name, this.description, this.reps);
+}
+
+class Workout {
+  String name;
+  String duration;
+  String goals;
+  List<WorkoutDay> days;
+
+  Workout(this.name, this.duration, this.goals, this.days);
+}
+
+class MyAppState extends ChangeNotifier {
+  WorkoutRequest request = WorkoutRequest([], [], [], '0h00m');
+  List<Workout> workouts = [];
+
+  void updateRequest(WorkoutRequest newReq) {
+    request = newReq;
+    notifyListeners();
+  }
+}
+
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
+  int index = 0;
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+      body: Column(
+        children: [
+          Text('AI Personal Trainer'),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        onPressed: () => showDialog(
+            context: context,
+            builder: (context) {
+              var canContinue = false;
+              var appState = context.watch<MyAppState>();
+              var days = appState.request.days;
+              var goals = appState.request.goals;
+              var modalities = appState.request.modalities;
+              var duration = appState.request.duration;
+
+              return StatefulBuilder(builder: (context, setState) {
+                Widget formStep;
+                print(duration);
+                switch (index) {
+                  case 0:
+                    formStep = WorkoutDaysForm();
+                    canContinue = days.isNotEmpty;
+                  case 1:
+                    formStep = WorkoutGoalsForm();
+                    canContinue = goals.isNotEmpty;
+                  case 2:
+                    formStep = WorkoutModalitiesForm();
+                    canContinue = modalities.isNotEmpty;
+                  case 3:
+                    formStep = WorkoutDurationForm();
+                    canContinue = duration != '0h00m';
+                  default:
+                    formStep = Placeholder();
+                }
+                return AlertDialog(
+                  title: Text('New Workout'),
+                  insetPadding: EdgeInsets.all(10),
+                  content: Container(
+                    width: MediaQuery.of(context).size.width - 100,
+                    padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                    child: formStep,
+                  ),
+                  actions: [
+                    index > 0
+                        ? ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                index--;
+                              });
+                            },
+                            child: Text('Back'))
+                        : SizedBox.shrink(),
+                    ElevatedButton(
+                        onPressed: index < 3 && canContinue
+                            ? () {
+                                setState(() {
+                                  index++;
+                                });
+                              }
+                            : index == 3 && canContinue
+                                ? () {
+                                    print(jsonEncode(appState.request));
+                                  }
+                                : null,
+                        child: Text(index < 3 ? 'Next' : 'Generate workout'))
+                  ],
+                );
+              });
+            }),
+        tooltip: 'New Workout',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
+    );
+  }
+}
+
+class WorkoutDaysForm extends StatefulWidget {
+  @override
+  State<WorkoutDaysForm> createState() => _WorkoutDaysFormState();
+}
+
+class _WorkoutDaysFormState extends State<WorkoutDaysForm> {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var days = appState.request.days;
+    toggleDay(String value) {
+      WorkoutRequest newReq = WorkoutRequest(
+          appState.request.days,
+          appState.request.goals,
+          appState.request.modalities,
+          appState.request.duration);
+      if (newReq.days.contains(value)) {
+        newReq.days.removeWhere((item) => item == value);
+        appState.updateRequest(newReq);
+        return;
+      }
+      newReq.days.add(value);
+      appState.updateRequest(newReq);
+    }
+
+    return Column(
+      children: [
+        Text('Select the days you want to train'),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Monday'),
+              value: days.contains('Monday'),
+              onChanged: (bool? value) => toggleDay('Monday')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Tuesday'),
+              value: days.contains('Tuesday'),
+              onChanged: (bool? value) => toggleDay('Tuesday')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Wednesday'),
+              value: days.contains('Wednesday'),
+              onChanged: (bool? value) => toggleDay('Wednesday')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Thursday'),
+              value: days.contains('Thursday'),
+              onChanged: (bool? value) => toggleDay('Thursday')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Friday'),
+              value: days.contains('Friday'),
+              onChanged: (bool? value) => toggleDay('Friday')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Saturday'),
+              value: days.contains('Saturday'),
+              onChanged: (bool? value) => toggleDay('Saturday')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Sunday'),
+              value: days.contains('Sunday'),
+              onChanged: (bool? value) => toggleDay('Sunday')),
+        )
+      ],
+    );
+  }
+}
+
+class WorkoutGoalsForm extends StatefulWidget {
+  @override
+  State<WorkoutGoalsForm> createState() => _WorkoutGoalsFormState();
+}
+
+class _WorkoutGoalsFormState extends State<WorkoutGoalsForm> {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var goals = appState.request.goals;
+    toggleGoal(String value) {
+      WorkoutRequest newReq = WorkoutRequest(
+          appState.request.days,
+          appState.request.goals,
+          appState.request.modalities,
+          appState.request.duration);
+      if (newReq.goals.contains(value)) {
+        newReq.goals.removeWhere((item) => item == value);
+        appState.updateRequest(newReq);
+        return;
+      }
+      newReq.goals.add(value);
+      appState.updateRequest(newReq);
+    }
+
+    return Column(
+      children: [
+        Text('Select your goals'),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Muscle Gain'),
+              value: goals.contains('Muscle Gain'),
+              onChanged: (bool? value) => toggleGoal('Muscle Gain')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Fat Loss'),
+              value: goals.contains('Fat Loss'),
+              onChanged: (bool? value) => toggleGoal('Fat Loss')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Improve Flexibility and Mobility'),
+              value: goals.contains('Improve Flexibility and Mobility'),
+              onChanged: (bool? value) =>
+                  toggleGoal('Improve Flexibility and Mobility')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Improve Agility and Speed'),
+              value: goals.contains('Improve Agility and Speed'),
+              onChanged: (bool? value) =>
+                  toggleGoal('Improve Agility and Speed')),
+        ),
+      ],
+    );
+  }
+}
+
+class WorkoutModalitiesForm extends StatefulWidget {
+  @override
+  State<WorkoutModalitiesForm> createState() => _WorkoutModalitiesFormState();
+}
+
+class _WorkoutModalitiesFormState extends State<WorkoutModalitiesForm> {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var modalities = appState.request.modalities;
+    toggleModality(String value) {
+      WorkoutRequest newReq = WorkoutRequest(
+          appState.request.days,
+          appState.request.goals,
+          appState.request.modalities,
+          appState.request.duration);
+      if (newReq.modalities.contains(value)) {
+        newReq.modalities.removeWhere((item) => item == value);
+        appState.updateRequest(newReq);
+        return;
+      }
+      newReq.modalities.add(value);
+      appState.updateRequest(newReq);
+    }
+
+    return Column(
+      children: [
+        Text('Select the modalities you want to train'),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Calisthenics'),
+              value: modalities.contains('Calisthenics'),
+              onChanged: (bool? value) => toggleModality('Calisthenics')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Weight Lifting'),
+              value: modalities.contains('Weight Lifting'),
+              onChanged: (bool? value) => toggleModality('Weight Lifting')),
+        ),
+        Card(
+          child: CheckboxListTile(
+              title: Text('Aerobics'),
+              value: modalities.contains('Aerobics'),
+              onChanged: (bool? value) => toggleModality('Aerobics')),
+        ),
+      ],
+    );
+  }
+}
+
+class WorkoutDurationForm extends StatefulWidget {
+  @override
+  State<WorkoutDurationForm> createState() => _WorkoutDurationFormState();
+}
+
+class _WorkoutDurationFormState extends State<WorkoutDurationForm> {
+  var currentDuration = ['0', '00'];
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    var duration = appState.request.duration;
+    changeDuration() {
+      var hours = currentDuration[0].isEmpty ? '0' : currentDuration[0];
+      var minutes = currentDuration[1].isEmpty ? '00' : currentDuration[1];
+      WorkoutRequest newReq = WorkoutRequest(
+          appState.request.days,
+          appState.request.goals,
+          appState.request.modalities,
+          appState.request.duration);
+      newReq.duration = '$hours\h$minutes\m';
+      appState.updateRequest(newReq);
+    }
+
+    return Column(
+      children: [
+        Text('Select the maximum duration of the workout'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 100,
+              child: TextFormField(
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(1)
+                ],
+                initialValue: duration.split('h')[0],
+                decoration: InputDecoration(labelText: 'Hours'),
+                onChanged: (value) => setState(() {
+                  currentDuration[0] = value;
+                  changeDuration();
+                }),
+              ),
+            ),
+            SizedBox(
+              width: 100,
+              child: TextFormField(
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(2)
+                ],
+                initialValue: duration.split('h')[1].substring(0, 2),
+                decoration: InputDecoration(labelText: 'Minutes'),
+                onChanged: (value) => setState(() {
+                  currentDuration[1] = value;
+                  changeDuration();
+                }),
+              ),
+            ),
+          ],
+        )
+      ],
     );
   }
 }
