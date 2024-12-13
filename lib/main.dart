@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:dart_openai/dart_openai.dart';
+import 'package:dotenv/dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -41,21 +43,29 @@ class WorkoutRequest {
       };
 }
 
-class WorkoutDay {
+class Exercise {
   String name;
   String description;
   String reps;
 
-  WorkoutDay(this.name, this.description, this.reps);
+  Exercise(this.name, this.description, this.reps);
+}
+
+class WorkoutDay {
+  String day;
+  String name;
+  String duration;
+  List<Exercise> exercises;
+
+  WorkoutDay(this.day, this.name, this.duration, this.exercises);
 }
 
 class Workout {
   String name;
-  String duration;
   String goals;
   List<WorkoutDay> days;
 
-  Workout(this.name, this.duration, this.goals, this.days);
+  Workout(this.name, this.goals, this.days);
 }
 
 class MyAppState extends ChangeNotifier {
@@ -71,6 +81,39 @@ class MyAppState extends ChangeNotifier {
 class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
+}
+
+Future<String> getResponse(WorkoutRequest request) async {
+  var env = DotEnv(includePlatformEnvironment: true)..load();
+  OpenAI.apiKey = env['API_KEY']!;
+  OpenAI.baseUrl = env['API_URL']!;
+
+  final systemMessage = OpenAIChatCompletionChoiceMessageModel(
+      role: OpenAIChatMessageRole.system,
+      content: [
+        OpenAIChatCompletionChoiceMessageContentItemModel.text(
+            env['SYS_PROMPT']!)
+      ]);
+
+  final userMessage = OpenAIChatCompletionChoiceMessageModel(
+      role: OpenAIChatMessageRole.user,
+      content: [
+        OpenAIChatCompletionChoiceMessageContentItemModel.text(
+            jsonEncode(request))
+      ]);
+
+  final requestMessages = [systemMessage, userMessage];
+
+  OpenAIChatCompletionModel response = await OpenAI.instance.chat.create(
+    model: "gpt-3.5-turbo",
+    responseFormat: {'type': 'json_object'},
+    seed: 6,
+    messages: requestMessages,
+    temperature: 0.2,
+  );
+
+  print(response.choices.first.message);
+  return response.choices.first.message.toString();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -96,7 +139,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
               return StatefulBuilder(builder: (context, setState) {
                 Widget formStep;
-                print(duration);
                 switch (index) {
                   case 0:
                     formStep = WorkoutDaysForm();
@@ -110,6 +152,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   case 3:
                     formStep = WorkoutDurationForm();
                     canContinue = duration != '0h00m';
+                  case 4:
+                    formStep = Center(child: CircularProgressIndicator());
                   default:
                     formStep = Placeholder();
                 }
@@ -122,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: formStep,
                   ),
                   actions: [
-                    index > 0
+                    index > 0 && index < 4
                         ? ElevatedButton(
                             onPressed: () {
                               setState(() {
@@ -131,19 +175,34 @@ class _MyHomePageState extends State<MyHomePage> {
                             },
                             child: Text('Back'))
                         : SizedBox.shrink(),
-                    ElevatedButton(
-                        onPressed: index < 3 && canContinue
-                            ? () {
-                                setState(() {
-                                  index++;
-                                });
-                              }
-                            : index == 3 && canContinue
+                    index < 4
+                        ? ElevatedButton(
+                            onPressed: index < 3 && canContinue
                                 ? () {
-                                    print(jsonEncode(appState.request));
+                                    setState(() {
+                                      index++;
+                                    });
                                   }
-                                : null,
-                        child: Text(index < 3 ? 'Next' : 'Generate workout'))
+                                : index == 3 && canContinue
+                                    ? () async {
+                                        setState(() {
+                                          index = 4;
+                                        });
+                                        await getResponse(appState.request);
+                                        if (context.mounted) {
+                                          setState(() {
+                                            index = 0;
+                                            appState.updateRequest(
+                                                WorkoutRequest(
+                                                    [], [], [], "0h00m"));
+                                          });
+                                          Navigator.pop(context, 'Success');
+                                        }
+                                      }
+                                    : null,
+                            child:
+                                Text(index < 3 ? 'Next' : 'Generate workout'))
+                        : SizedBox.shrink(),
                   ],
                 );
               });
