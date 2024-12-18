@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:ai_personal_trainer/service/get_response.dart';
+import 'package:ai_personal_trainer/service/workout_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +22,9 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.deepPurple, brightness: Brightness.light),
         ),
-        home: MyHomePage(),
+        home: MyHomePage(
+          storage: WorkoutStorage(),
+        ),
       ),
     );
   }
@@ -55,6 +60,9 @@ class Exercise {
         description: json['description'] as String,
         reps: json['reps'] as String);
   }
+
+  Map<String, dynamic> toJson() =>
+      {'name': name, 'description': description, 'reps': reps};
 }
 
 class WorkoutDay {
@@ -74,6 +82,12 @@ class WorkoutDay {
         duration: json['duration'] as String,
         exercises: exercises);
   }
+
+  Map<String, dynamic> toJson() => {
+        'day': day,
+        'duration': duration,
+        'exercises': exercises.map((e) => e.toJson()).toList(),
+      };
 }
 
 class Workout {
@@ -100,34 +114,59 @@ class Workout {
         modalities: modalities,
         days: days);
   }
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'goals': goals,
+        'modalities': modalities,
+        'days': days.map((day) => day.toJson()).toList()
+      };
 }
 
 class MyAppState extends ChangeNotifier {
   WorkoutRequest request = WorkoutRequest([], [], [], '0h00m');
-  List<Workout> workouts = [];
 
   void updateRequest(WorkoutRequest newReq) {
     request = newReq;
     notifyListeners();
   }
-
-  void addWorkout(Workout workout) {
-    workouts.add(workout);
-    notifyListeners();
-  }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.storage});
+
+  final WorkoutStorage storage;
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   int index = 0;
+  List<Workout> workouts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    widget.storage.readWorkouts().then((data) {
+      if (data.isNotEmpty) {
+        setState(() {
+          workouts = data;
+        });
+      }
+    });
+  }
+
+  Future<File> addWorkout(Workout workout) {
+    setState(() {
+      workouts.add(workout);
+    });
+
+    return widget.storage.writeWorkouts(workouts);
+  }
+
   @override
   Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var workouts = appState.workouts;
     return Scaffold(
       appBar: AppBar(
         title: Text('AI Personal Trainer'),
@@ -225,7 +264,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     });
                                     var newWorkout =
                                         await getResponse(appState.request);
-                                    appState.addWorkout(newWorkout);
+                                    addWorkout(newWorkout);
                                     if (context.mounted) {
                                       setState(() {
                                         index = 0;
@@ -611,7 +650,7 @@ class _WorkoutDurationFormState extends State<WorkoutDurationForm> {
           appState.request.goals,
           appState.request.modalities,
           appState.request.duration);
-      newReq.duration = '$hours\h$minutes\m';
+      newReq.duration = '${hours}h${minutes}m';
       appState.updateRequest(newReq);
     }
 
