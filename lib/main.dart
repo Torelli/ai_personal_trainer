@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.deepPurple, brightness: Brightness.light),
+              seedColor: Colors.indigo, brightness: Brightness.light),
         ),
         home: MyHomePage(
           storage: WorkoutStorage(),
@@ -165,6 +165,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return widget.storage.writeWorkouts(workouts);
   }
 
+  Future<File> removeWorkout(int index) {
+    setState(() {
+      workouts.removeAt(index);
+    });
+
+    return widget.storage.writeWorkouts(workouts);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,8 +189,12 @@ class _MyHomePageState extends State<MyHomePage> {
             )
           : ListView(
               children: workouts
+                  .asMap()
+                  .entries
                   .map((w) => WorkoutCard(
-                        workout: w,
+                        workout: w.value,
+                        index: w.key,
+                        removeWorkout: removeWorkout,
                       ))
                   .toList(),
             ),
@@ -262,16 +274,23 @@ class _MyHomePageState extends State<MyHomePage> {
                                     setState(() {
                                       index = 4;
                                     });
-                                    var newWorkout =
-                                        await getResponse(appState.request);
-                                    addWorkout(newWorkout);
-                                    if (context.mounted) {
-                                      setState(() {
-                                        index = 0;
-                                        appState.updateRequest(WorkoutRequest(
-                                            [], [], [], "0h00m"));
-                                      });
-                                      Navigator.pop(context, 'Success');
+                                    try {
+                                      var newWorkout =
+                                          await getResponse(appState.request);
+                                      addWorkout(newWorkout);
+                                      if (context.mounted) {
+                                        setState(() {
+                                          index = 0;
+                                          appState.updateRequest(WorkoutRequest(
+                                              [], [], [], "0h00m"));
+                                        });
+                                        Navigator.pop(context, 'Success');
+                                      }
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  'Something went wrong, try again later')));
                                     }
                                   }
                                 : null,
@@ -285,12 +304,15 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class WorkoutCard extends StatelessWidget {
-  const WorkoutCard({
-    super.key,
-    required this.workout,
-  });
+  const WorkoutCard(
+      {super.key,
+      required this.workout,
+      required this.index,
+      required this.removeWorkout});
 
   final Workout workout;
+  final int index;
+  final Function removeWorkout;
 
   @override
   Widget build(BuildContext context) {
@@ -304,7 +326,11 @@ class WorkoutCard extends StatelessWidget {
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return WorkoutPage(workout: workout);
+              return WorkoutPage(
+                workout: workout,
+                index: index,
+                removeWorkout: removeWorkout,
+              );
             }));
           },
         ),
@@ -314,12 +340,15 @@ class WorkoutCard extends StatelessWidget {
 }
 
 class WorkoutPage extends StatelessWidget {
-  const WorkoutPage({
-    super.key,
-    required this.workout,
-  });
+  const WorkoutPage(
+      {super.key,
+      required this.workout,
+      required this.index,
+      required this.removeWorkout});
 
   final Workout workout;
+  final int index;
+  final Function removeWorkout;
 
   @override
   Widget build(BuildContext context) {
@@ -336,6 +365,34 @@ class WorkoutPage extends StatelessWidget {
                       text: d.day,
                     ))
                 .toList(),
+          ),
+        ),
+        endDrawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              ListTile(
+                leading: Icon(Icons.settings),
+                tileColor: Theme.of(context).colorScheme.inversePrimary,
+                title: Text(
+                  'Options',
+                ),
+              ),
+              ListTile(
+                leading: Icon(
+                  Icons.delete,
+                  color: Colors.red,
+                ),
+                title: Text(
+                  'Delete workout',
+                  style: TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  removeWorkout(index);
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+              )
+            ],
           ),
         ),
         body: TabBarView(
