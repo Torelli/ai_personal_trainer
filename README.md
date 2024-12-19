@@ -6,6 +6,7 @@ AI Personal Trainer is a Flutter-based application designed to generate personal
 
 - **🛠️ Customizable Workouts**: Define your training days, fitness goals, preferred training modalities, and workout duration.
 - **🧠 AI-Powered Planning**: Utilizes OpenAI's GPT-3.5-Turbo to create personalized workout plans.
+- **💾 Workout Storage**: Save and manage your workout plans locally for easy access.
 - **🎨 Interactive UI**: Step-by-step forms to input your workout preferences.
 - **⚙️ State Management**: Powered by the `Provider` package for efficient app state management.
 
@@ -15,6 +16,7 @@ AI Personal Trainer is a Flutter-based application designed to generate personal
 - **dart_openai**: To interact with the OpenAI API.
 - **dotenv**: For managing environment variables securely.
 - **Provider**: For state management.
+- **Local Storage**: Save workouts using custom data handling.
 
 ## 🚀 Getting Started
 
@@ -28,7 +30,7 @@ AI Personal Trainer is a Flutter-based application designed to generate personal
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-repository-url/ai-personal-trainer.git
+   git clone https://github.com/torelli/ai_personal_trainer.git
    cd ai-personal-trainer
    ```
 
@@ -60,23 +62,21 @@ AI Personal Trainer is a Flutter-based application designed to generate personal
    - 🎯 Choose your fitness goals.
    - 🏃‍♂️ Pick your preferred training modalities (e.g., calisthenics, weightlifting).
    - ⏱️ Specify the maximum duration of your workout.
-4. Click **Generate Workout** to receive a personalized workout plan.
+4. Save and view your workouts in the local storage feature.
+5. Click **Generate Workout** to receive a personalized workout plan.
 
 ## 📂 Project Structure
 
 - **`lib/`**: Contains the main application code.
   - **`main.dart`**: Entry point of the app.
   - **State Management**: `MyAppState` class manages the workout request and generated plans.
+  - **Workout Storage**: Logic to store and retrieve workout plans locally.
   - **UI Components**: Includes forms for selecting days, goals, modalities, and duration.
-- **Dependencies**: `dart_openai`, `dotenv`, `provider`, `flutter/material.dart`.
+  - **API Integration**: Handled by `get_response.dart`.
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please fork the repository and create a pull request with your changes.
-
-## 📜 License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 ## 🙌 Acknowledgments
 
