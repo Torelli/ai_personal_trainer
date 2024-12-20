@@ -81,10 +81,21 @@ class _WorkoutDayViewState extends State<WorkoutDayView> {
                             Wrap(
                               children: [
                                 Text(
-                                  'Reps: ',
+                                  AppLocalizations.of(context)
+                                      .translate('reps'),
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 Text(e.reps)
+                              ],
+                            ),
+                            Wrap(
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)
+                                      .translate('rest'),
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(e.rest)
                               ],
                             ),
                             Text(e.description)
