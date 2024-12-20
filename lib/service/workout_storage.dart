@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:ai_personal_trainer/main.dart';
+import 'package:ai_personal_trainer/model/workout.dart';
 import 'package:path_provider/path_provider.dart';
 
 class WorkoutStorage {

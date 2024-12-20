@@ -1,16 +1,103 @@
 import 'dart:io';
 
+import 'package:ai_personal_trainer/model/workout_day.dart';
+import 'package:ai_personal_trainer/model/workout_request.dart';
 import 'package:ai_personal_trainer/service/get_response.dart';
 import 'package:ai_personal_trainer/service/workout_storage.dart';
+import 'package:ai_personal_trainer/model/workout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+
+  // ignore: library_private_types_in_public_api
+  static _MyAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>()!;
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTheme();
+  }
+
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('theme') == null) {
+      return;
+    }
+    if (prefs.getString('theme') == 'dark') {
+      setState(() {
+        _themeMode = ThemeMode.dark;
+      });
+    }
+    if (prefs.getString('theme') == 'light') {
+      setState(() {
+        _themeMode = ThemeMode.light;
+      });
+    }
+  }
+
+  void toggleTheme() async {
+    var brightness = MediaQuery.of(context).platformBrightness;
+    bool isDarkMode = brightness == Brightness.dark;
+    final prefs = await SharedPreferences.getInstance();
+
+    switch (_themeMode) {
+      case ThemeMode.system:
+        setState(() {
+          if (isDarkMode) {
+            _themeMode = ThemeMode.light;
+            prefs.setString('theme', 'light');
+          } else {
+            _themeMode = ThemeMode.dark;
+            prefs.setString('theme', 'dark');
+          }
+        });
+      case ThemeMode.light:
+        setState(() {
+          _themeMode = ThemeMode.dark;
+          prefs.setString('theme', 'dark');
+        });
+      default:
+        setState(() {
+          _themeMode = ThemeMode.light;
+          prefs.setString('theme', 'light');
+        });
+    }
+  }
+
+  IconData getCorrectIcon() {
+    var brightness = MediaQuery.of(context).platformBrightness;
+    bool isDarkMode = brightness == Brightness.dark;
+    IconData icon;
+    switch (_themeMode) {
+      case ThemeMode.system:
+        if (isDarkMode) {
+          icon = Icons.light_mode;
+        } else {
+          icon = Icons.dark_mode;
+        }
+      case ThemeMode.light:
+        icon = Icons.dark_mode;
+      default:
+        icon = Icons.light_mode;
+    }
+    return icon;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -22,6 +109,12 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
               seedColor: Colors.indigo, brightness: Brightness.light),
         ),
+        darkTheme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.indigo, brightness: Brightness.dark),
+        ),
+        themeMode: _themeMode,
         home: MyHomePage(
           storage: WorkoutStorage(),
         ),
@@ -30,98 +123,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class WorkoutRequest {
-  List<String> days;
-  List<String> goals;
-  List<String> modalities;
-  String duration;
-
-  WorkoutRequest(this.days, this.goals, this.modalities, this.duration);
-
-  Map toJson() => {
-        'days': days,
-        'modalities': modalities,
-        'goals': goals,
-        'duration': duration
-      };
-}
-
-class Exercise {
-  late String name;
-  late String description;
-  late String reps;
-  bool isExpanded = false;
-
-  Exercise({required this.name, required this.description, required this.reps});
-
-  factory Exercise.fromJson(Map<String, dynamic> json) {
-    return Exercise(
-        name: json['name'] as String,
-        description: json['description'] as String,
-        reps: json['reps'] as String);
-  }
-
-  Map<String, dynamic> toJson() =>
-      {'name': name, 'description': description, 'reps': reps};
-}
-
-class WorkoutDay {
-  late String day;
-  late String duration;
-  late List<Exercise> exercises;
-
-  WorkoutDay(
-      {required this.day, required this.duration, required this.exercises});
-
-  factory WorkoutDay.fromJson(Map<String, dynamic> json) {
-    var exercisesJson = json['exercises'] as List;
-    List<Exercise> exercises =
-        exercisesJson.map((v) => Exercise.fromJson(v)).toList();
-    return WorkoutDay(
-        day: json['day'] as String,
-        duration: json['duration'] as String,
-        exercises: exercises);
-  }
-
-  Map<String, dynamic> toJson() => {
-        'day': day,
-        'duration': duration,
-        'exercises': exercises.map((e) => e.toJson()).toList(),
-      };
-}
-
-class Workout {
-  late String name;
-  late List<String> goals;
-  late List<String> modalities;
-  late List<WorkoutDay> days;
-
-  Workout(
-      {required this.name,
-      required this.goals,
-      required this.modalities,
-      required this.days});
-
-  factory Workout.fromJson(
-      Map<String, dynamic> json, List<String> goals, List<String> modalities) {
-    var daysObjsJson = json['days'] as List;
-    List<WorkoutDay> days =
-        daysObjsJson.map((v) => WorkoutDay.fromJson(v)).toList();
-
-    return Workout(
-        name: json['name'] as String,
-        goals: goals,
-        modalities: modalities,
-        days: days);
-  }
-
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'goals': goals,
-        'modalities': modalities,
-        'days': days.map((day) => day.toJson()).toList()
-      };
-}
+extension on State<MyApp> {}
 
 class MyAppState extends ChangeNotifier {
   WorkoutRequest request = WorkoutRequest([], [], [], '0h00m');
@@ -144,6 +146,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int index = 0;
   List<Workout> workouts = [];
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -176,9 +179,60 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('AI Personal Trainer'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+              onPressed: () => _scaffoldKey.currentState!.openEndDrawer(),
+              icon: Icon(Icons.settings))
+        ],
+      ),
+      endDrawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+              tileColor: Theme.of(context).colorScheme.inversePrimary,
+            ),
+            ListTile(
+              leading: Icon(MyApp.of(context).getCorrectIcon()),
+              title: Text('Change theme'),
+              onTap: () => MyApp.of(context).toggleTheme(),
+            ),
+            ListTile(
+              leading: Icon(Icons.info),
+              title: Text('About'),
+              onTap: () => showAboutDialog(
+                  context: context,
+                  applicationVersion: '1.0.0',
+                  children: [
+                    Wrap(
+                      children: [
+                        Text('Created by '),
+                        InkWell(
+                          child: Text('Torelli'),
+                          onTap: () {
+                            try {
+                              launchUrlString('https://github.com/Torelli',
+                                  mode: LaunchMode.externalApplication);
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Couldn\'t open the browser :(')));
+                            }
+                          },
+                        )
+                      ],
+                    )
+                  ]),
+            )
+          ],
+        ),
       ),
       body: workouts.isEmpty
           ? Center(
@@ -287,10 +341,20 @@ class _MyHomePageState extends State<MyHomePage> {
                                         Navigator.pop(context, 'Success');
                                       }
                                     } catch (e) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                              content: Text(
-                                                  'Something went wrong, try again later')));
+                                      appState.updateRequest(
+                                          WorkoutRequest([], [], [], "0h00m"));
+                                      if (context.mounted) {
+                                        setState(() {
+                                          index = 0;
+                                          appState.updateRequest(WorkoutRequest(
+                                              [], [], [], "0h00m"));
+                                        });
+                                        Navigator.pop(context, 'Fail');
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content: Text(
+                                                    'Something went wrong, try again later')));
+                                      }
                                     }
                                   }
                                 : null,
@@ -352,12 +416,20 @@ class WorkoutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffoldStateKey = GlobalKey<ScaffoldState>();
+
     return DefaultTabController(
       initialIndex: 0,
       length: workout.days.length,
       child: Scaffold(
+        key: scaffoldStateKey,
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          actions: [
+            IconButton(
+                onPressed: () => scaffoldStateKey.currentState!.openEndDrawer(),
+                icon: Icon(Icons.wysiwyg))
+          ],
           title: Text(workout.name),
           bottom: TabBar(
             tabs: workout.days
@@ -372,10 +444,10 @@ class WorkoutPage extends StatelessWidget {
             padding: EdgeInsets.zero,
             children: [
               ListTile(
-                leading: Icon(Icons.settings),
+                leading: Icon(Icons.wysiwyg),
                 tileColor: Theme.of(context).colorScheme.inversePrimary,
                 title: Text(
-                  'Options',
+                  'Workout Options',
                 ),
               ),
               ListTile(

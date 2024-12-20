@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:ai_personal_trainer/main.dart';
+import 'package:ai_personal_trainer/model/workout_request.dart';
+import 'package:ai_personal_trainer/model/workout.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:dotenv/dotenv.dart';
 
