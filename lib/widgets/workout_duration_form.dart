@@ -1,5 +1,6 @@
 import 'package:ai_personal_trainer/model/workout_request.dart';
-import 'package:ai_personal_trainer/widgets/my_app_state.dart';
+import 'package:ai_personal_trainer/service/app_localizations.dart';
+import 'package:ai_personal_trainer/service/my_app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +30,7 @@ class _WorkoutDurationFormState extends State<WorkoutDurationForm> {
 
     return Column(
       children: [
-        Text('Select the maximum duration of the workout'),
+        Text(AppLocalizations.of(context).translate('selectDuration')),
         Wrap(
           children: [
             SizedBox(
@@ -41,7 +42,8 @@ class _WorkoutDurationFormState extends State<WorkoutDurationForm> {
                   LengthLimitingTextInputFormatter(1)
                 ],
                 initialValue: duration.split('h')[0],
-                decoration: InputDecoration(labelText: 'Hours'),
+                decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context).translate('hours')),
                 onChanged: (value) => setState(() {
                   currentDuration[0] = value;
                   changeDuration();
@@ -57,7 +59,9 @@ class _WorkoutDurationFormState extends State<WorkoutDurationForm> {
                   LengthLimitingTextInputFormatter(2)
                 ],
                 initialValue: duration.split('h')[1].substring(0, 2),
-                decoration: InputDecoration(labelText: 'Minutes'),
+                decoration: InputDecoration(
+                    labelText:
+                        AppLocalizations.of(context).translate('minutes')),
                 onChanged: (value) => setState(() {
                   currentDuration[1] = value;
                   changeDuration();

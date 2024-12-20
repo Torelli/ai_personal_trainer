@@ -1,5 +1,6 @@
 import 'package:ai_personal_trainer/model/workout_request.dart';
-import 'package:ai_personal_trainer/widgets/my_app_state.dart';
+import 'package:ai_personal_trainer/service/app_localizations.dart';
+import 'package:ai_personal_trainer/service/my_app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,48 +31,62 @@ class _WorkoutDaysFormState extends State<WorkoutDaysForm> {
 
     return Column(
       children: [
-        Text('Select the days you want to train'),
+        Text(AppLocalizations.of(context).translate('selectDays')),
         Card(
           child: CheckboxListTile(
-              title: Text('Monday'),
-              value: days.contains('Monday'),
-              onChanged: (bool? value) => toggleDay('Monday')),
+              title: Text(AppLocalizations.of(context).translate('monday')),
+              value: days
+                  .contains(AppLocalizations.of(context).translate('monday')),
+              onChanged: (bool? value) =>
+                  toggleDay(AppLocalizations.of(context).translate('monday'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Tuesday'),
-              value: days.contains('Tuesday'),
-              onChanged: (bool? value) => toggleDay('Tuesday')),
+              title: Text(AppLocalizations.of(context).translate('tuesday')),
+              value: days
+                  .contains(AppLocalizations.of(context).translate('tuesday')),
+              onChanged: (bool? value) =>
+                  toggleDay(AppLocalizations.of(context).translate('tuesday'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Wednesday'),
-              value: days.contains('Wednesday'),
-              onChanged: (bool? value) => toggleDay('Wednesday')),
+              title: Text(AppLocalizations.of(context).translate('wednesday')),
+              value: days.contains(
+                  AppLocalizations.of(context).translate('wednesday')),
+              onChanged: (bool? value) => toggleDay(
+                  AppLocalizations.of(context).translate('wednesday'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Thursday'),
-              value: days.contains('Thursday'),
-              onChanged: (bool? value) => toggleDay('Thursday')),
+              title: Text(AppLocalizations.of(context).translate('thursday')),
+              value: days
+                  .contains(AppLocalizations.of(context).translate('thursday')),
+              onChanged: (bool? value) => toggleDay(
+                  AppLocalizations.of(context).translate('thursday'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Friday'),
-              value: days.contains('Friday'),
-              onChanged: (bool? value) => toggleDay('Friday')),
+              title: Text(AppLocalizations.of(context).translate('friday')),
+              value: days
+                  .contains(AppLocalizations.of(context).translate('friday')),
+              onChanged: (bool? value) =>
+                  toggleDay(AppLocalizations.of(context).translate('friday'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Saturday'),
-              value: days.contains('Saturday'),
-              onChanged: (bool? value) => toggleDay('Saturday')),
+              title: Text(AppLocalizations.of(context).translate('saturday')),
+              value: days
+                  .contains(AppLocalizations.of(context).translate('saturday')),
+              onChanged: (bool? value) => toggleDay(
+                  AppLocalizations.of(context).translate('saturday'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Sunday'),
-              value: days.contains('Sunday'),
-              onChanged: (bool? value) => toggleDay('Sunday')),
+              title: Text(AppLocalizations.of(context).translate('sunday')),
+              value: days
+                  .contains(AppLocalizations.of(context).translate('sunday')),
+              onChanged: (bool? value) =>
+                  toggleDay(AppLocalizations.of(context).translate('sunday'))),
         )
       ],
     );

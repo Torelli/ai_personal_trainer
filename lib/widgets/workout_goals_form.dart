@@ -1,5 +1,6 @@
 import 'package:ai_personal_trainer/model/workout_request.dart';
-import 'package:ai_personal_trainer/widgets/my_app_state.dart';
+import 'package:ai_personal_trainer/service/app_localizations.dart';
+import 'package:ai_personal_trainer/service/my_app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,32 +31,41 @@ class _WorkoutGoalsFormState extends State<WorkoutGoalsForm> {
 
     return Column(
       children: [
-        Text('Select your goals'),
+        Text(AppLocalizations.of(context).translate('selectGoals')),
         Card(
           child: CheckboxListTile(
-              title: Text('Muscle Gain'),
-              value: goals.contains('Muscle Gain'),
-              onChanged: (bool? value) => toggleGoal('Muscle Gain')),
+              title: Text(AppLocalizations.of(context).translate('muscleGain')),
+              value: goals.contains(
+                  AppLocalizations.of(context).translate('muscleGain')),
+              onChanged: (bool? value) => toggleGoal(
+                  AppLocalizations.of(context).translate('muscleGain'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Fat Loss'),
-              value: goals.contains('Fat Loss'),
-              onChanged: (bool? value) => toggleGoal('Fat Loss')),
+              title: Text(AppLocalizations.of(context).translate('fatLoss')),
+              value: goals
+                  .contains(AppLocalizations.of(context).translate('fatLoss')),
+              onChanged: (bool? value) => toggleGoal(
+                  AppLocalizations.of(context).translate('fatLoss'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Improve Flexibility and Mobility'),
-              value: goals.contains('Improve Flexibility and Mobility'),
-              onChanged: (bool? value) =>
-                  toggleGoal('Improve Flexibility and Mobility')),
+              title: Text(AppLocalizations.of(context)
+                  .translate('flexibilityMobility')),
+              value: goals.contains(AppLocalizations.of(context)
+                  .translate('flexibilityMobility')),
+              onChanged: (bool? value) => toggleGoal(
+                  AppLocalizations.of(context)
+                      .translate('flexibilityMobility'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Improve Agility and Speed'),
-              value: goals.contains('Improve Agility and Speed'),
-              onChanged: (bool? value) =>
-                  toggleGoal('Improve Agility and Speed')),
+              title:
+                  Text(AppLocalizations.of(context).translate('agilitySpeed')),
+              value: goals.contains(
+                  AppLocalizations.of(context).translate('agilitySpeed')),
+              onChanged: (bool? value) => toggleGoal(
+                  AppLocalizations.of(context).translate('agilitySpeed'))),
         ),
       ],
     );

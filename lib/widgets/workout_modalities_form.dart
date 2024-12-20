@@ -1,5 +1,6 @@
 import 'package:ai_personal_trainer/model/workout_request.dart';
-import 'package:ai_personal_trainer/widgets/my_app_state.dart';
+import 'package:ai_personal_trainer/service/app_localizations.dart';
+import 'package:ai_personal_trainer/service/my_app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,24 +31,32 @@ class _WorkoutModalitiesFormState extends State<WorkoutModalitiesForm> {
 
     return Column(
       children: [
-        Text('Select the modalities you want to train'),
+        Text(AppLocalizations.of(context).translate('selectModalities')),
         Card(
           child: CheckboxListTile(
-              title: Text('Calisthenics'),
-              value: modalities.contains('Calisthenics'),
-              onChanged: (bool? value) => toggleModality('Calisthenics')),
+              title:
+                  Text(AppLocalizations.of(context).translate('calisthenics')),
+              value: modalities.contains(
+                  AppLocalizations.of(context).translate('calisthenics')),
+              onChanged: (bool? value) => toggleModality(
+                  AppLocalizations.of(context).translate('calisthenics'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Weight Lifting'),
-              value: modalities.contains('Weight Lifting'),
-              onChanged: (bool? value) => toggleModality('Weight Lifting')),
+              title:
+                  Text(AppLocalizations.of(context).translate('weightLifting')),
+              value: modalities.contains(
+                  AppLocalizations.of(context).translate('weightLifting')),
+              onChanged: (bool? value) => toggleModality(
+                  AppLocalizations.of(context).translate('weightLifting'))),
         ),
         Card(
           child: CheckboxListTile(
-              title: Text('Aerobics'),
-              value: modalities.contains('Aerobics'),
-              onChanged: (bool? value) => toggleModality('Aerobics')),
+              title: Text(AppLocalizations.of(context).translate('aerobics')),
+              value: modalities
+                  .contains(AppLocalizations.of(context).translate('aerobics')),
+              onChanged: (bool? value) => toggleModality(
+                  AppLocalizations.of(context).translate('aerobics'))),
         ),
       ],
     );

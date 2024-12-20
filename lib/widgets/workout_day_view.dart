@@ -1,5 +1,6 @@
 import 'package:ai_personal_trainer/model/workout.dart';
 import 'package:ai_personal_trainer/model/workout_day.dart';
+import 'package:ai_personal_trainer/service/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutDayView extends StatefulWidget {
@@ -23,7 +24,7 @@ class _WorkoutDayViewState extends State<WorkoutDayView> {
           children: [
             Wrap(children: [
               Text(
-                'Modalities: ',
+                AppLocalizations.of(context).translate('modalities'),
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
@@ -34,7 +35,7 @@ class _WorkoutDayViewState extends State<WorkoutDayView> {
             Wrap(
               children: [
                 Text(
-                  'Goals: ',
+                  AppLocalizations.of(context).translate('goals'),
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
@@ -46,7 +47,7 @@ class _WorkoutDayViewState extends State<WorkoutDayView> {
             Wrap(
               children: [
                 Text(
-                  'Duration: ',
+                  AppLocalizations.of(context).translate('duration'),
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(

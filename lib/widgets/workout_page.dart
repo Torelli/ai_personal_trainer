@@ -1,4 +1,5 @@
 import 'package:ai_personal_trainer/model/workout.dart';
+import 'package:ai_personal_trainer/service/app_localizations.dart';
 import 'package:ai_personal_trainer/widgets/workout_day_view.dart';
 import 'package:flutter/material.dart';
 
@@ -46,7 +47,7 @@ class WorkoutPage extends StatelessWidget {
                 leading: Icon(Icons.wysiwyg),
                 tileColor: Theme.of(context).colorScheme.inversePrimary,
                 title: Text(
-                  'Workout Options',
+                  AppLocalizations.of(context).translate('workoutOptions'),
                 ),
               ),
               ListTile(
@@ -55,7 +56,7 @@ class WorkoutPage extends StatelessWidget {
                   color: Colors.red,
                 ),
                 title: Text(
-                  'Delete workout',
+                  AppLocalizations.of(context).translate('deleteWorkout'),
                   style: TextStyle(color: Colors.red),
                 ),
                 onTap: () {

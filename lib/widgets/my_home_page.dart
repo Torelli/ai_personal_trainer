@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:ai_personal_trainer/main.dart';
+import 'package:ai_personal_trainer/model/languages.dart';
 import 'package:ai_personal_trainer/model/workout.dart';
 import 'package:ai_personal_trainer/model/workout_request.dart';
+import 'package:ai_personal_trainer/service/app_language.dart';
+import 'package:ai_personal_trainer/service/app_localizations.dart';
 import 'package:ai_personal_trainer/service/get_response.dart';
 import 'package:ai_personal_trainer/service/workout_storage.dart';
-import 'package:ai_personal_trainer/widgets/my_app_state.dart';
+import 'package:ai_personal_trainer/service/my_app_state.dart';
 import 'package:ai_personal_trainer/widgets/workout_card.dart';
 import 'package:ai_personal_trainer/widgets/workout_days_form.dart';
 import 'package:ai_personal_trainer/widgets/workout_duration_form.dart';
@@ -59,6 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var appLanguage = Provider.of<AppLanguage>(context);
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -76,24 +80,109 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             ListTile(
               leading: Icon(Icons.settings),
-              title: Text('Settings'),
+              title: Text(AppLocalizations.of(context).translate('settings')),
               tileColor: Theme.of(context).colorScheme.inversePrimary,
             ),
             ListTile(
               leading: Icon(MyApp.of(context).getCorrectIcon()),
-              title: Text('Change theme'),
+              title:
+                  Text(AppLocalizations.of(context).translate('changeTheme')),
               onTap: () => MyApp.of(context).toggleTheme(),
             ),
             ListTile(
+              leading: Icon(Icons.language),
+              title: Text(
+                  AppLocalizations.of(context).translate('changeLanguage')),
+              onTap: () => showDialog(
+                  context: context,
+                  builder: (context) {
+                    // ignore: no_leading_underscores_for_local_identifiers
+                    var _selectedLanguage =
+                        appLanguage.appLocal.toString() == 'en'
+                            ? Languages.us
+                            : Languages.pt;
+
+                    return StatefulBuilder(builder: (context, setState) {
+                      return AlertDialog(
+                        title: Text(AppLocalizations.of(context)
+                            .translate('changeLanguage')),
+                        insetPadding: EdgeInsets.all(10),
+                        content: SingleChildScrollView(
+                          child: Container(
+                            width: MediaQuery.of(context).size.width - 100,
+                            padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  title: Text(AppLocalizations.of(context)
+                                      .translate('us_EN')),
+                                  leading: Radio<Languages>(
+                                    value: Languages.us,
+                                    groupValue: _selectedLanguage,
+                                    onChanged: (Languages? value) {
+                                      if (value == Languages.us) {
+                                        setState(
+                                          () {
+                                            _selectedLanguage = Languages.us;
+                                          },
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                                ListTile(
+                                  title: Text(AppLocalizations.of(context)
+                                      .translate('pt_BR')),
+                                  leading: Radio<Languages>(
+                                    value: Languages.pt,
+                                    groupValue: _selectedLanguage,
+                                    onChanged: (Languages? value) {
+                                      if (value == Languages.pt) {
+                                        setState(
+                                          () {
+                                            _selectedLanguage = Languages.pt;
+                                          },
+                                        );
+                                      }
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          ElevatedButton(
+                              onPressed: () => Navigator.pop(context, 'Cancel'),
+                              child: Text(AppLocalizations.of(context)
+                                  .translate('cancel'))),
+                          ElevatedButton(
+                              onPressed: () {
+                                if (_selectedLanguage.toString() !=
+                                    appLanguage.appLocal.toString()) {
+                                  appLanguage.changeLanguage(
+                                      Locale(_selectedLanguage.name));
+                                  Navigator.pop(context, 'OK');
+                                }
+                              },
+                              child: Text(AppLocalizations.of(context)
+                                  .translate('ok'))),
+                        ],
+                      );
+                    });
+                  }),
+            ),
+            ListTile(
               leading: Icon(Icons.info),
-              title: Text('About'),
+              title: Text(AppLocalizations.of(context).translate('about')),
               onTap: () => showAboutDialog(
                   context: context,
                   applicationVersion: '1.0.0',
                   children: [
                     Wrap(
                       children: [
-                        Text('Created by '),
+                        Text(AppLocalizations.of(context)
+                            .translate('createdBy')),
                         InkWell(
                           child: Text('Torelli'),
                           onTap: () {
@@ -103,8 +192,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                      content: Text(
-                                          'Couldn\'t open the browser :(')));
+                                      content: Text(AppLocalizations.of(context)
+                                          .translate('browserError'))));
                             }
                           },
                         )
@@ -119,7 +208,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [Text('You don\'t have any workouts yet')],
+                children: [
+                  Text(AppLocalizations.of(context).translate('noWorkouts'))
+                ],
               ),
             )
           : ListView(
@@ -135,7 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => createWorkoutForm(context),
-        tooltip: 'New Workout',
+        tooltip: AppLocalizations.of(context).translate('newWorkout'),
         child: const Icon(Icons.add),
       ),
     );
@@ -174,7 +265,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 formStep = throw UnimplementedError();
             }
             return AlertDialog(
-              title: index < 4 ? Text('New Workout') : SizedBox.shrink(),
+              title: index < 4
+                  ? Text(AppLocalizations.of(context).translate('newWorkout'))
+                  : SizedBox.shrink(),
               insetPadding: EdgeInsets.all(10),
               backgroundColor: index == 4
                   ? Colors.transparent
@@ -194,7 +287,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             index--;
                           });
                         },
-                        child: Text('Back'))
+                        child: Text(
+                            AppLocalizations.of(context).translate('back')))
                     : SizedBox.shrink(),
                 index < 4
                     ? ElevatedButton(
@@ -234,12 +328,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(SnackBar(
                                                 content: Text(
-                                                    'Something went wrong, try again later')));
+                                                    AppLocalizations.of(context)
+                                                        .translate(
+                                                            'genericError'))));
                                       }
                                     }
                                   }
                                 : null,
-                        child: Text(index < 3 ? 'Next' : 'Generate workout'))
+                        child: Text(AppLocalizations.of(context)
+                            .translate(index < 3 ? 'next' : 'generateWorkout')))
                     : SizedBox.shrink(),
               ],
             );
