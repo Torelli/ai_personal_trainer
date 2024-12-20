@@ -237,6 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
         barrierDismissible: index == 4 ? false : true,
         context: context,
         builder: (context) {
+          var appLanguage = Provider.of<AppLanguage>(context);
           var canContinue = false;
           var appState = context.watch<MyAppState>();
           var days = appState.request.days;
@@ -304,8 +305,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                       index = 4;
                                     });
                                     try {
-                                      var newWorkout =
-                                          await getResponse(appState.request);
+                                      var newWorkout = await getResponse(
+                                          appState.request,
+                                          appLanguage.appLocal.toString());
                                       addWorkout(newWorkout);
                                       if (context.mounted) {
                                         setState(() {
