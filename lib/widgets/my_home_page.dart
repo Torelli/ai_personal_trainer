@@ -30,7 +30,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int index = 0;
   List<Workout> workouts = [];
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -66,12 +66,12 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('AI Personal Trainer'),
+        title: const Text('AI Personal Trainer'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
           IconButton(
               onPressed: () => _scaffoldKey.currentState!.openEndDrawer(),
-              icon: Icon(Icons.settings))
+              icon: const Icon(Icons.settings))
         ],
       ),
       endDrawer: Drawer(
@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: EdgeInsets.zero,
           children: [
             ListTile(
-              leading: Icon(Icons.settings),
+              leading: const Icon(Icons.settings),
               title: Text(AppLocalizations.of(context).translate('settings')),
               tileColor: Theme.of(context).colorScheme.inversePrimary,
             ),
@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onTap: () => MyApp.of(context).toggleTheme(),
             ),
             ListTile(
-              leading: Icon(Icons.language),
+              leading: const Icon(Icons.language),
               title: Text(
                   AppLocalizations.of(context).translate('changeLanguage')),
               onTap: () => showDialog(
@@ -106,11 +106,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       return AlertDialog(
                         title: Text(AppLocalizations.of(context)
                             .translate('changeLanguage')),
-                        insetPadding: EdgeInsets.all(10),
+                        insetPadding: const EdgeInsets.all(10),
                         content: SingleChildScrollView(
                           child: Container(
                             width: MediaQuery.of(context).size.width - 100,
-                            padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                            padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
                             child: Column(
                               children: [
                                 ListTile(
@@ -173,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   }),
             ),
             ListTile(
-              leading: Icon(Icons.info),
+              leading: const Icon(Icons.info),
               title: Text(AppLocalizations.of(context).translate('about')),
               onTap: () => showAboutDialog(
                   context: context,
@@ -184,7 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Text(AppLocalizations.of(context)
                             .translate('createdBy')),
                         InkWell(
-                          child: Text('Torelli'),
+                          child: const Text('Torelli'),
                           onTap: () {
                             try {
                               launchUrlString('https://github.com/Torelli',
@@ -249,34 +249,34 @@ class _MyHomePageState extends State<MyHomePage> {
             Widget formStep;
             switch (index) {
               case 0:
-                formStep = WorkoutDaysForm();
+                formStep = const WorkoutDaysForm();
                 canContinue = days.isNotEmpty;
               case 1:
-                formStep = WorkoutGoalsForm();
+                formStep = const WorkoutGoalsForm();
                 canContinue = goals.isNotEmpty;
               case 2:
-                formStep = WorkoutModalitiesForm();
+                formStep = const WorkoutModalitiesForm();
                 canContinue = modalities.isNotEmpty;
               case 3:
-                formStep = WorkoutDurationForm();
+                formStep = const WorkoutDurationForm();
                 canContinue = duration != '0h00m';
               case 4:
-                formStep = Center(child: CircularProgressIndicator());
+                formStep = const Center(child: CircularProgressIndicator());
               default:
                 formStep = throw UnimplementedError();
             }
             return AlertDialog(
               title: index < 4
                   ? Text(AppLocalizations.of(context).translate('newWorkout'))
-                  : SizedBox.shrink(),
-              insetPadding: EdgeInsets.all(10),
+                  : const SizedBox.shrink(),
+              insetPadding: const EdgeInsets.all(10),
               backgroundColor: index == 4
                   ? Colors.transparent
                   : Theme.of(context).dialogBackgroundColor,
               content: SingleChildScrollView(
                 child: Container(
                   width: MediaQuery.of(context).size.width - 100,
-                  padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                  padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
                   child: formStep,
                 ),
               ),
@@ -290,7 +290,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         },
                         child: Text(
                             AppLocalizations.of(context).translate('back')))
-                    : SizedBox.shrink(),
+                    : const SizedBox.shrink(),
                 index < 4
                     ? ElevatedButton(
                         onPressed: index < 3 && canContinue
@@ -339,7 +339,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 : null,
                         child: Text(AppLocalizations.of(context)
                             .translate(index < 3 ? 'next' : 'generateWorkout')))
-                    : SizedBox.shrink(),
+                    : const SizedBox.shrink(),
               ],
             );
           });

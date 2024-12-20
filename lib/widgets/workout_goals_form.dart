@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class WorkoutGoalsForm extends StatefulWidget {
+  const WorkoutGoalsForm({super.key});
+
   @override
   State<WorkoutGoalsForm> createState() => _WorkoutGoalsFormState();
 }

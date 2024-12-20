@@ -18,7 +18,7 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   final AppLanguage appLanguage;
-  MyApp({required this.appLanguage});
+  const MyApp({super.key, required this.appLanguage});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -113,8 +113,11 @@ class _MyAppState extends State<MyApp> {
               child: MaterialApp(
                 title: 'AI PersonalTrainer',
                 locale: model.appLocal,
-                supportedLocales: [Locale('en', 'US'), Locale('pt', 'BR')],
-                localizationsDelegates: [
+                supportedLocales: const [
+                  Locale('en', 'US'),
+                  Locale('pt', 'BR')
+                ],
+                localizationsDelegates: const [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,
                   GlobalWidgetsLocalizations.delegate,

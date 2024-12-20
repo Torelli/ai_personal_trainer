@@ -18,29 +18,29 @@ class _WorkoutDayViewState extends State<WorkoutDayView> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Wrap(children: [
               Text(
                 AppLocalizations.of(context).translate('modalities'),
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
                 widget.workout.modalities.join(', '),
-                style: TextStyle(fontStyle: FontStyle.italic),
+                style: const TextStyle(fontStyle: FontStyle.italic),
               ),
             ]),
             Wrap(
               children: [
                 Text(
                   AppLocalizations.of(context).translate('goals'),
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
                   widget.workout.goals.join(', '),
-                  style: TextStyle(fontStyle: FontStyle.italic),
+                  style: const TextStyle(fontStyle: FontStyle.italic),
                 )
               ],
             ),
@@ -48,15 +48,15 @@ class _WorkoutDayViewState extends State<WorkoutDayView> {
               children: [
                 Text(
                   AppLocalizations.of(context).translate('duration'),
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
                   widget.day.duration,
-                  style: TextStyle(fontStyle: FontStyle.italic),
+                  style: const TextStyle(fontStyle: FontStyle.italic),
                 )
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             ExpansionPanelList(
@@ -74,7 +74,7 @@ class _WorkoutDayViewState extends State<WorkoutDayView> {
                         );
                       },
                       body: Padding(
-                        padding: EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -83,7 +83,8 @@ class _WorkoutDayViewState extends State<WorkoutDayView> {
                                 Text(
                                   AppLocalizations.of(context)
                                       .translate('reps'),
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 Text(e.reps)
                               ],
@@ -93,7 +94,8 @@ class _WorkoutDayViewState extends State<WorkoutDayView> {
                                 Text(
                                   AppLocalizations.of(context)
                                       .translate('rest'),
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 Text(e.rest)
                               ],

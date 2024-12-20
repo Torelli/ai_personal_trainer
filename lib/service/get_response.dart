@@ -33,8 +33,6 @@ Future<Workout> getResponse(WorkoutRequest request, String locale) async {
     temperature: 0.2,
   );
 
-  print(response.choices.first.message.content![0].text);
-
   final Map<String, dynamic> parsed =
       jsonDecode(response.choices.first.message.content![0].text.toString());
 

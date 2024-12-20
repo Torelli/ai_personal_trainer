@@ -28,7 +28,7 @@ class WorkoutPage extends StatelessWidget {
           actions: [
             IconButton(
                 onPressed: () => scaffoldStateKey.currentState!.openEndDrawer(),
-                icon: Icon(Icons.wysiwyg))
+                icon: const Icon(Icons.wysiwyg))
           ],
           title: Text(workout.name),
           bottom: TabBar(
@@ -44,20 +44,20 @@ class WorkoutPage extends StatelessWidget {
             padding: EdgeInsets.zero,
             children: [
               ListTile(
-                leading: Icon(Icons.wysiwyg),
+                leading: const Icon(Icons.wysiwyg),
                 tileColor: Theme.of(context).colorScheme.inversePrimary,
                 title: Text(
                   AppLocalizations.of(context).translate('workoutOptions'),
                 ),
               ),
               ListTile(
-                leading: Icon(
+                leading: const Icon(
                   Icons.delete,
                   color: Colors.red,
                 ),
                 title: Text(
                   AppLocalizations.of(context).translate('deleteWorkout'),
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
                 onTap: () {
                   removeWorkout(index);

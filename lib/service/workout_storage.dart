@@ -32,11 +32,8 @@ class WorkoutStorage {
           .toList()
           .cast<Workout>();
 
-      print(workouts);
-
       return workouts;
     } catch (e) {
-      print(e);
       return [];
     }
   }
