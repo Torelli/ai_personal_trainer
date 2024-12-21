@@ -41,5 +41,7 @@
     "us_EN": "Inglês (US)",
     "pt_BR": "Português (Brasil)",
     "ok": "Ok",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "delete": "Apagar",
+    "confirmDeleteWorkout": "Tem certeza que deseja apagar esse treino?"
 }

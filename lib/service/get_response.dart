@@ -2,18 +2,17 @@ import 'dart:convert';
 import 'package:ai_personal_trainer/model/workout_request.dart';
 import 'package:ai_personal_trainer/model/workout.dart';
 import 'package:dart_openai/dart_openai.dart';
-import 'package:dotenv/dotenv.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<Workout> getResponse(WorkoutRequest request, String locale) async {
-  var env = DotEnv(includePlatformEnvironment: true)..load();
-  OpenAI.apiKey = env['API_KEY']!;
-  OpenAI.baseUrl = env['API_URL']!;
+  OpenAI.apiKey = dotenv.env['API_KEY']!;
+  OpenAI.baseUrl = dotenv.env['API_URL']!;
 
   final systemMessage = OpenAIChatCompletionChoiceMessageModel(
       role: OpenAIChatMessageRole.system,
       content: [
         OpenAIChatCompletionChoiceMessageContentItemModel.text(
-            env[locale == 'en' ? 'SYS_PROMPT_EN' : 'SYS_PROMPT_PT']!)
+            dotenv.env[locale == 'en' ? 'SYS_PROMPT_EN' : 'SYS_PROMPT_PT']!)
       ]);
 
   final userMessage = OpenAIChatCompletionChoiceMessageModel(

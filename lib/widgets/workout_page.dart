@@ -59,10 +59,37 @@ class WorkoutPage extends StatelessWidget {
                   AppLocalizations.of(context).translate('deleteWorkout'),
                   style: const TextStyle(color: Colors.red),
                 ),
-                onTap: () {
-                  removeWorkout(index);
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
+                onTap: () => showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text(AppLocalizations.of(context)
+                            .translate('deleteWorkout')),
+                        content: Text(AppLocalizations.of(context)
+                            .translate('confirmDeleteWorkout')),
+                        actions: [
+                          ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(AppLocalizations.of(context)
+                                  .translate('cancel'))),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red),
+                            onPressed: () {
+                              removeWorkout(index);
+                              Navigator.of(context)
+                                  .popUntil((route) => route.isFirst);
+                            },
+                            child: Text(
+                              AppLocalizations.of(context).translate('delete'),
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          )
+                        ],
+                      );
+                    }),
               )
             ],
           ),

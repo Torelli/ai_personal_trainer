@@ -4,11 +4,14 @@ import 'package:ai_personal_trainer/service/workout_storage.dart';
 import 'package:ai_personal_trainer/service/my_app_state.dart';
 import 'package:ai_personal_trainer/widgets/my_home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
+  await dotenv.load();
+  WidgetsFlutterBinding.ensureInitialized();
   AppLanguage appLanguage = AppLanguage();
   await appLanguage.fetchLocale();
   runApp(MyApp(
