@@ -41,5 +41,7 @@
     "us_EN": "English (US)",
     "pt_BR": "Portuguese (Brazil)",
     "ok": "Ok",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirmDeleteWorkout": "Are you sure you want to delete this workout?"
 }
